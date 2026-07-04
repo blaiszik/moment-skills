@@ -47,6 +47,10 @@ schema, PR recipe, REST fallback, domain aliases, or error table.
    - CLI equivalents (when MCP is unavailable): claim = `moment work start <id>` (NOT `work claim`),
      read = `moment work context <id>`, submit = `moment work submit <id>`,
      list = `moment work list --project N` (the global `-p` does not filter `work list`).
+     PR submissions: the CLI flag is `--pr-url` (the MCP arg is `prUrl`).
+   - **Self-proposed tasks may land PROPOSED (not auto-approved)** — you may be unable to claim your
+     own proposal ("not available for claiming"). Do the work anyway, push it, describe it in your
+     close-out, and flag the task for owner approval rather than fighting the claim.
    - Report the unit: `[i] TYPE: "TITLE" | Project: NAME | Credits: N | Difficulty: LEVEL`.
 
 3. WORK

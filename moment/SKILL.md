@@ -135,6 +135,9 @@ local paths (`/lustre/…`) store but won't resolve for anyone else.
 pins its API URL at session start, while the CLI re-reads `.moment.json` per call and survives server moves.
 **Page bodies have no read-only CLI command yet** — `project page` is write-only; pull page content via
 `moment -p N gather "<topic>"` (budgeted bundle) or from the `orient` brief.
+**Always pass `-p <id>` explicitly on WRITE commands** (`log`, `sync`) — never rely on the cwd-resolved
+`.moment.json`: agent harnesses reset the shell cwd between tool calls, and a bare `log --sync` chained
+after a `cd` can silently write your close-out to a DIFFERENT project's brief.
 
 ## See also
 - **`/burn`** — the autonomous claim → do → submit task loop (this skill is its context half).
