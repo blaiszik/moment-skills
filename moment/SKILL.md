@@ -44,9 +44,16 @@ a graph of typed resources). This skill reads and writes that shared Brief — t
 local-only `continuity`. The loop: **orient → pull → enrich → close out**, no task claim required.
 (For the autonomous claim → do → submit loop, use **`/burn`**.)
 
+Fastest spin-up order (adapted for reading and orienting):
+1. `whats_new()` — see what changed across your projects since last time.
+2. `get_project_context(projectId, view: "spinup")` — a lean peek to decide whether to engage.
+3. `get_project_context(projectId)` — the full brief once you commit to the project.
+4. `get_task_context(taskId)` — call BEFORE claiming to preview a task's fit; after claim_task it returns the full working set.
+
 **Two surfaces, same capabilities.** Check which is live in one step — *don't fan out ToolSearch*: if a
 `mcp__moment-research__*` tool is in your tool list, use MCP; if not, the server isn't connected — go straight
 to the **`mamba run -n moment moment` CLI** (the REST API underneath; MCP and CLI are thin proxies).
+This in-repo copy targets the local Moment dev server by default (`http://localhost:3000`).
 
 > **Most tasks need only the block below.** Run it and stop. Reach for the full catalog
 > (**[reference.md](reference.md)** — every tool's exact signature, all CLI flags, enums, recipes) only when
@@ -84,8 +91,9 @@ Prefer `bootstrap` over the four separate calls (`create_project` → `upsert_pa
 `search_context` check) is also how you avoid duplicate hubs. Linked a repo? `import_context(projectId)`
 auto-seeds from the README instead of a hand-written page.
 
-**Keep the Brief scannable:** put the real content in the **page**; the handoff and note are terse *pointers* to
-it, not a third copy of the same prose.
+**Keep the Brief scannable:** the depth lives in the **page** — don't duplicate it. But the handoff and note
+must **stand alone**: sized to the work, they tell the next agent what changed, what to do next, and what to
+watch, without making them open the page to get the gist.
 
 ## Ownership & access — know this before you write
 - A project you create is owned by **your creator** (the user whose key you carry) — you can't set another owner.
@@ -98,19 +106,9 @@ it, not a third copy of the same prose.
 The last step of any work session (the "close out" in the loop): `log_session(N, note, handoff?)`, and promote
 lasting reference material to a page (`upsert_page`, `agentRead:true` for must-know conventions/gotchas).
 
-**Write the friction, not just the design.** The most valuable thing you leave is **what slowed you down** —
-not a description of what you built. The next agent can read the diff; they can't see the footgun you already
-hit. So:
-- **`watchOut`** = the trap you just stepped in — a stale config, a tool that isn't what you'd assume (e.g.
-  "tests are jest not vitest"), a load-bearing ordering, an API that doesn't return the field you expected.
-  Concrete and specific, not "be careful."
-- **`nextStep`** = the single next action, specific enough to start cold. **`worksNow` / `blockers`** = the
-  state that changed.
-- `note` = what you did + why, terse. Durable gotchas/conventions belong in an `agentRead` page (e.g.
-  `/architecture-conventions` → its "Gotchas that cost time" section), not buried in a note that scrolls away.
-
-> Before you close out, ask: *"what cost me time that the next agent will repeat?"* — and record THAT. A
-> close-out that only restates the happy path is the most common way the Brief rots.
+Use the [writing quality rubric](reference.md#writing-quality-rubric): record what changed, the concrete
+friction/watch-out, what to do next, and any durable page/resource updates. Keep the depth in pages, but make
+the note and handoff stand alone.
 
 ## Which tool when (signatures + flags → [reference.md](reference.md))
 | Need | MCP | CLI |
@@ -129,6 +127,14 @@ hit. So:
 subcommands take the id **positionally**. Handoff fields (`--works-now/--watch-out/…`) live on top-level `log`,
 **not** `project log`. **Resources are whole artifacts by resolvable URL** — link the repo root, not each file;
 local paths (`/lustre/…`) store but won't resolve for anyone else.
+**Task verbs differ between MCP and CLI** — don't guess: MCP `claim_task` = CLI **`moment work start <id>`**
+(there is no `work claim`); MCP `submit_task` = **`moment work submit <id>`**; read a task with
+**`moment work context <id>`** (there is no `work show`). **`moment work list` ignores the global `-p`**
+(silently unfiltered) — use the subcommand flag: `moment work list --project N`.
+**If an MCP `moment-research` tool errors ("fetch failed"), switch to the CLI immediately** — the MCP server
+pins its API URL at session start, while the CLI re-reads `.moment.json` per call and survives server moves.
+**Page bodies have no read-only CLI command yet** — `project page` is write-only; pull page content via
+`moment -p N gather "<topic>"` (budgeted bundle) or from the `orient` brief.
 
 ## See also
 - **`/burn`** — the autonomous claim → do → submit task loop (this skill is its context half).

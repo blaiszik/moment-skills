@@ -34,6 +34,9 @@ to git" warning; default to `--json --quiet`. JSON → **stdout**, warnings → 
 parser). Micro-opt: `MOMENT=$(mamba run -n moment which moment)` once, then call `$MOMENT …` to skip env
 re-resolution per spawn.
 
+**Target an environment:** this in-repo copy defaults to local development (`http://localhost:3000`). Use the
+public kit's plain `moment` CLI and cloud defaults only outside this repo-local setup.
+
 **REST fallback** (only if MCP **and** CLI are down): key + base URL in `.mcp.json` (`--api-key=`, `--api-url=`);
 auth `-H "Authorization: Bearer <KEY>"`. Endpoints below each section.
 
@@ -96,7 +99,8 @@ Finder choice: **explore** (many projects) → **get_project_context** (one proj
 - **`link_context` `kind` ∈** SUPERSEDES · REFUTES · CONTRADICTS · EVIDENCE_FOR · DEPENDS_ON · PART_OF · DUPLICATES · ANSWERS · REPRODUCES; **node types** PAGE · RESOURCE · SESSION_NOTE · PROJECT
 
 > **Resource granularity (the common mistake).** A resource is something you'd *cite or hand a collaborator as a
-> unit*: a **code repo** (link the repo root, not files), a **paper/PDF** (arXiv/DOI/PDF URL), a **dataset**
+> unit*: a **code repo** (link the repo root, not files), a **paper/PDF** (arXiv/DOI, or a direct PDF URL —
+> the resolver extracts the PDF's text layer on `read_resource`), a **dataset**
 > (landing/download URL), a **doc** (Drive/Notion link). One `add_resource` per artifact. **Don't add a resource
 > per file you touched** — describe the work in a **page** and let the linked repo stand for its files.
 > Resources must be **resolvable URLs**; a local path (`/lustre/…`) is stored as-is but no one else can fetch it.
@@ -106,10 +110,15 @@ Finder choice: **explore** (many projects) → **get_project_context** (one proj
 |-----|-----|---------------|
 | `log_session(projectId, note, nextStep?, taskId?, handoff?)` | handoff fields → **top-level** `log`: `moment -p N log --note "…" --next "…" --works-now "…" --in-progress "…" --blocked "…" --watch-out "…"` · note-only: `moment project log N --note "…" --next-step "…"` | Log a session note + optionally patch the handoff (**only the fields you pass change**). ⚠️ Handoff flags live on `moment -p N log`, **not** `moment project log N`. REST: `POST …/projects/{id}/session-notes` |
 
-Keep it scannable: the page holds the content; the handoff/note are terse pointers, not a third copy.
+### Writing quality rubric
+
+Keep it scannable: the depth lives in the page, but the handoff/note must **stand alone** — sized to the work,
+they tell the next agent what changed, what's next, and what to watch without opening the page.
 **`watchOut` is the friction you hit, not the design you landed** — the stale config, the surprising tool ("tests
 are jest not vitest"), the load-bearing ordering, the field an API didn't return. Ask *"what cost me time that the
 next agent will repeat?"* and record THAT; durable gotchas → an `agentRead` page, not a note that scrolls away.
+Be as thorough as the contribution warrants — a hard-won dead-end deserves full detail (what you tried + why it
+failed, the trap, the links); a one-line fix needs one line. Never compress real signal; never pad trivial work.
 
 ## Task awareness (read-only — claim→submit loop is `/burn`)
 `get_tasks(projectId?)` · `get_task_context(taskId)` · `get_my_claims(includeRecentlyDecided?)` ·
@@ -123,15 +132,21 @@ claim + submit → **`/burn`**.
 pages; `search_context("topic")` for related work elsewhere.
 
 **Pull in the page/paper on X** — `compile_context(N, task:"X")` for a bundle, or `list_resources(N)` →
-`read_resource(N, rid)` for one artifact's full text.
+`read_resource(N, rid)` for one artifact's full text (a PDF resource resolves to its extracted text).
+
+**Drop in a transcript, thread, or PDF (the text connector)** — `ingest(N, text, source:"transcript")` turns an
+unstructured stream into reviewable candidates (a summary page + signals + a session note); nothing is
+auto-published. PDFs are a first-class input: for a **local PDF** run `moment ingest paper.pdf` (the CLI extracts
+the text, then ingests it); for a **PDF URL** prefer `add_resource(N, url)` + `read_resource` (the resolver
+extracts on demand).
 
 **Add a page** — `upsert_page(N, title, body, slug:"stable", agentRead:true?)`. Figure? `upload_image` → embed
 `![](url)`. Cite a whole artifact? `add_resource(N, uri, summary:"why")` (one per artifact). Replaces an old
 page? `link_context(N,"PAGE","new","PAGE","old","SUPERSEDES")`.
 
 **Close out** — `log_session(N, note:"did / next / watch", handoff:{ nextStep, watchOut, worksNow })` — patch only
-changed fields. Honest and short; make `watchOut` the **friction you hit** (footguns, stale config, surprises),
-not a restatement of what you built.
+changed fields. Make `watchOut` the **friction you hit** (footguns, stale config, surprises) and record what you
+*tried* that failed, not just a restatement of what you built. Follow the writing quality rubric above.
 
 ## Output Format (when reporting to a human)
 ```
