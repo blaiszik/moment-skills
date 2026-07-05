@@ -53,11 +53,31 @@ Fastest spin-up order (adapted for reading and orienting):
 **Two surfaces, same capabilities.** Check which is live in one step — *don't fan out ToolSearch*: if a
 `mcp__moment-research__*` tool is in your tool list, use MCP; if not, the server isn't connected — go straight
 to the **`mamba run -n moment moment` CLI** (the REST API underneath; MCP and CLI are thin proxies).
-This in-repo copy targets the local Moment dev server by default (`http://localhost:3000`).
+This in-repo copy usually targets the local dev server; external users target the cloud — see below.
 
 > **Most tasks need only the block below.** Run it and stop. Reach for the full catalog
 > (**[reference.md](reference.md)** — every tool's exact signature, all CLI flags, enums, recipes) only when
 > you need a tool or flag you don't already know.
+
+## Which Moment server — cloud or local?
+
+There are two instances; **know which one you're talking to before any read or write**:
+
+- **Cloud (the lab):** `https://moment-next.vercel.app` — the production instance. This is the
+  default choice for anyone who did not start the server themselves.
+- **Local dev:** `http://localhost:3000` (or the `apiUrl` in the repo's `.moment.json`) — only
+  when you are running moment-next locally.
+
+⚠️ **The CLI's built-in fallback is `http://localhost:3000`** — on a machine with no config it
+will silently target a (probably nonexistent) local server. If you're a cloud user, set the URL
+explicitly, once: `export MOMENT_API_URL=https://moment-next.vercel.app` (env), or put
+`{"apiUrl": "https://moment-next.vercel.app"}` in `~/.moment.json` alongside your key.
+
+Full resolution order (first hit wins): `--api-url` flag → repo `./.moment.json` →
+`MOMENT_API_URL` env → `~/.moment.json` → localhost:3000 default. Note the repo `.moment.json`
+OUTRANKS the env var — a cloned repo bound to someone's local instance will override your env;
+pass `--api-url` to force. API keys are per-instance: a local dev key will not work against the
+cloud and vice versa ("Invalid API key" = check the URL first, then the key).
 
 ## Cold start — create a project + seed its Brief (the 90% case)
 

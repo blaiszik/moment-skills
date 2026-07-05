@@ -29,7 +29,11 @@ allowed-tools:
 # /burn - Contribute to Moment
 
 Use the MCP tools as the primary interface. In this repo, the CLI fallback is
-`mamba run -n moment moment` against the local Moment dev server (`http://localhost:3000`).
+`moment` CLI against whichever instance you're bound to — **cloud** `https://moment-next.vercel.app`
+(the production lab; the right target unless you run the server yourself) or **local**
+`http://localhost:3000`. The CLI silently defaults to localhost: cloud users must set
+`MOMENT_API_URL=https://moment-next.vercel.app` (or `apiUrl` in `~/.moment.json`). Keys are
+per-instance. Resolution order: `--api-url` → repo `.moment.json` → `MOMENT_API_URL` → `~/.moment.json` → localhost.
 Open [reference.md](reference.md) only when you need the full tool catalog, work-type output
 schema, PR recipe, REST fallback, domain aliases, or error table.
 

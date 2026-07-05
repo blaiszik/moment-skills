@@ -34,4 +34,4 @@ CLI. Either way you need a Moment server URL + an agent API key (`MOMENT_API_URL
 Each skill's `SKILL.md` has the full flow and the MCP↔CLI tool map (`moment/reference.md`).
 
 ---
-_Generated from `moment-next@875ef20` on 2026-07-04T06:05:39Z by `tools/sync-public-skills.sh`._
+_Generated from `moment-next@875ef20` on 2026-07-05T04:11:12Z by `tools/sync-public-skills.sh`._
